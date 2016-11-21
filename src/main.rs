@@ -46,13 +46,14 @@ fn str_to_uints(strindex:&str)->(u8, u8){
 }
 
 
-fn convert_to_bin(index_list:Vec<&str>){
+fn convert_to_bin(index_list:Vec<&str>)->Vec<(u8,u8)> {
 //    let test:Vec<(u8,u8)> = index_list.iter().map(|strindex| (5,6)).collect() ;
-    let test:Vec<(u8,u8)> = index_list.iter().map(|strindex| str_to_uints(strindex)).collect() ;
+    let test: Vec<(u8,u8)> = index_list.iter().map(|strindex| str_to_uints(strindex)).collect() ;
 
     for &tup in test.iter(){
         println!("{} {}" , tup.0, tup.1) ;
     }
+    return test
 }
 
 
@@ -81,10 +82,11 @@ fn main() {
 //    let mut set_2: [PairInt;5] = [struct1, struct2 , struct3 , struct4 , struct5];
 
     let bindexes = convert_to_bin(vindexes);
-//    println!("{}" ,bindexes[0]);
+//    bindexes.testtype();
+    //println!("{}" ,bindexes);
 
-    for index in indexes.iter() {
-        println!("Hello, world! {}" , index);
+    for index in bindexes.iter() {
+        println!("Hello, world! {}" , index.1);
     }
 
     println!("Size of set_2 {}" , set_2.len())
