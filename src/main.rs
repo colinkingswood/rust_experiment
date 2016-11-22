@@ -1,20 +1,4 @@
 
-struct PairRef<'a> {
-    a: &'a i8,
-    b: &'a i8,
-}
-
-struct PairInt{
-    a: i8,
-    b: i8,
-}
-
-//fn convert_to_bin(index_list:Vec<&str>) -> Vec<u8>{
-//    for  index in index_list.into_iter(){
-//        println!("{}" , index) ;
-//    }
-//}
-
 /* take the string representation and convert it to a tuple of u8*/
 fn str_to_uints(strindex:&str)->(u8, u8){
 
@@ -36,58 +20,125 @@ fn str_to_uints(strindex:&str)->(u8, u8){
             bitstr_gc.push('0') ;
         }
     }
+
+    // convert sting to u8
     let int_ac = u8::from_str_radix(&bitstr_ac, 2).unwrap();
     let int_gc = u8::from_str_radix(&bitstr_gc, 2).unwrap();
 
-    println!("{} {}" , bitstr_ac, int_ac);
-    println!("{} {}" , bitstr_gc, int_gc);
+    println!("{} {} {} {} {}" , strindex, bitstr_ac, int_ac, bitstr_gc, int_gc);
 
     (int_ac , int_gc)
 }
 
 
 fn convert_to_bin(index_list:Vec<&str>)->Vec<(u8,u8)> {
-//    let test:Vec<(u8,u8)> = index_list.iter().map(|strindex| (5,6)).collect() ;
-    let test: Vec<(u8,u8)> = index_list.iter().map(|strindex| str_to_uints(strindex)).collect() ;
-
-    for &tup in test.iter(){
-        println!("{} {}" , tup.0, tup.1) ;
-    }
-    return test
+    let binvec: Vec<(u8,u8)> = index_list.iter().map(|strindex| str_to_uints(strindex)).collect() ;
+    return binvec
 }
 
 
-fn combine(index_list: Vec<&str>){
-    for  index in &index_list{
-        println!("{}" , index) ;
-    }
+fn combine(index_list: Vec<Vec<(u8,u8)>>){
 
+    let per_lane = index_list[0].len();
+    println!("{}" , per_lane );
+    let to_add : Vec<(u8,u8)> = get_next_list(&index_list);
+    let combined: Vec<Vec<(u8,u8)>> = vec![] ;
+    for  outer in index_list.iter(){
+        //println!("{}" , inde) ;
+        for inner in outer.iter(){
+
+            println!("yey: {} {}" , inner.0, inner.1) ;
+        }
+    }
 }
 
+
+/*
+    takes a 2d array and returns the last column,
+    so it can be combined again
+    1,2,3         3
+    2,3,4    =>   4
+    3,4,5         5
+
+*/
+fn get_next_list(current_list:&Vec<Vec<(u8,u8)>>)->Vec<(u8,u8)>{
+//    let size: usize = current_list.len();
+    let mut next_list: Vec<(u8,u8)> = vec![] ;
+    for (i, row) in current_list.iter().enumerate(){
+        if i != 0 {
+            let vals: (u8,u8) = row[0] ;
+//        println!("last {}" ,vals.0);
+            next_list.push(vals)
+        }
+    }
+
+//    let mut next_list:[(u8,u8)] = current_list.iter().map(|row| row[0][0]).collect();
+//    println!("{} {}", size , next_list.len());
+    return next_list
+}
+
+/*
+    Takes a 1 d array of tuples and turns into a 2d array
+    [1, 2, 3, 4] => [[1] , [2], [3], [4]]
+*/
+fn to_vec(bindex_pair:(u8,u8) )-> Vec<(u8,u8)> {
+    let wrapped: Vec<(u8,u8)> = vec![bindex_pair];
+    return wrapped;
+}
 
 fn main() {
 
-    let indexes: [&str;5] = [ "ACACTGTG", "GCGCATAT","AGAGCTCT","ATCGATCG","GCATGCAT"];
+//    let indexes: [&str;5] = [ "ACACTGTG", "GCGCATAT","AGAGCTCT","ATCGATCG","GCATGCAT"];
     let vindexes = vec![ "ACACTGTG", "GCGCATAT","AGAGCTCT","ATCGATCG","GCATGCAT"];
+    let bindexes = convert_to_bin(vindexes); // returns a vector of tuples Vec[(u8,u8), (u8,u8), (u8,u8),]
+    let wrapped_bindexes:Vec<Vec<(u8,u8)>> = bindexes.iter().map(|bindex| to_vec(*bindex)).collect();
+    combine( wrapped_bindexes );
 
-    let struct1 = PairInt { a: 5 , b: 35  } ;
-    let struct2 = PairInt { a: 5 , b: 35  } ;
-    let struct3 = PairInt { a: 5 , b: 35  } ;
-    let struct4 = PairInt { a: 5 , b: 35  } ;
-    let struct5 = PairInt { a: 5 , b: 35  } ;
-
-
-    let index_size: usize = indexes.len() ;
-    let mut set_2: [&PairInt;5] = [&struct1, &struct2 , &struct3 , &struct4 , &struct5];
-//    let mut set_2: [PairInt;5] = [struct1, struct2 , struct3 , struct4 , struct5];
-
-    let bindexes = convert_to_bin(vindexes);
-//    bindexes.testtype();
-    //println!("{}" ,bindexes);
-
-    for index in bindexes.iter() {
-        println!("Hello, world! {}" , index.1);
-    }
-
-    println!("Size of set_2 {}" , set_2.len())
 }
+
+/*
+    1
+    2
+    3
+    4
+    5
+    6    6
+
+    1,2
+    1,3
+    1,4
+    1,5
+    1,6
+    2,3
+    2,4
+    2,5
+    2,6
+    3,4
+    3,5
+    3,6
+    4,5
+    4,6
+    5,6    15
+
+    1,2,3
+    1,2,4
+    1,2,5
+    1,2,6
+    1,3,4
+    1,3,5
+    1,3,6
+    1,4,5
+    1,4,6
+    1,5,6
+    2,3,4
+    2,3,5
+    2,3,6
+    2,4,5
+    2,4,6
+    2,5,6
+    3,4,5
+    3,4,6
+    3,5,6
+    4,5,6   20
+
+*/
