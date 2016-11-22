@@ -37,6 +37,17 @@ fn convert_to_bin(index_list:Vec<&str>)->Vec<(u8,u8)> {
 }
 
 
+
+/*
+Pass in  the following:
+
+[                    outer
+    [(u8,u8) , (u8, u8) , ],       inner  (second round)
+    [(u8,u8) ,  ],                 inner  (first round)
+    [(u8,u8) ,  ],
+
+]
+*/
 fn combine(index_list: Vec<Vec<(u8,u8)>>){
 
     let per_lane = index_list[0].len();
